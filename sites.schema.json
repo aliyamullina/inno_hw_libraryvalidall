@@ -1,0 +1,5 @@
+{
+    "type": "object",
+    "properties": {"site": {"type": "string"}, "ip": {"type": "string"}},
+    "required": ["site", "ip"],
+}
