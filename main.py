@@ -1,9 +1,15 @@
+import json
 import jsonschema as jsonschema
-from typing import Any
+from typing import Any, Callable
 from exceptions import InputParameterVerificationError, ResultVerificationError
 
 
-def valid_all():
+def valid_all(
+        input_validation: Callable,
+        result_validation: Callable,
+        default_behavior: Callable = None,
+        on_fail_repeat_times: int = 4
+) -> Callable:
     """Универсальный декоратор для валидации входных и
     выходных параметров функции."""
 
@@ -31,42 +37,39 @@ def valid_all():
         pass
 
 
-# json: сайт и ip-адрес
-def validate_json_with_schema(file: dict, schema: dict) -> Any:
+def validate_json_with_schema(file: dict) -> Any:
     """Происходит валидация входных данных."""
     try:
-        jsonschema.validate(file, schema)
-        return file
+        with open('sites.schema.json', 'r', encoding='utf-8') as file_schema:
+            schema = json.load(file_schema)
+            jsonschema.validate(file, schema)
+            return file
     except jsonschema.exceptions.ValidationError as err:
         print("Ошибка валидации json:", err)
         return False
 
 
-def check_site_name(file: dict) -> Any:
+def check_ip_address_with_regex(file: dict) -> Any:
     """Проверка доменных имен."""
     pass
 
 
 @valid_all(
     input_validation=validate_json_with_schema,
-    result_validation=check_site_name,
-    # default_behavior=default_behavior,
-    on_fail_repeat_times=4
+    result_validation=check_ip_address_with_regex,
+    default_behavior=None,
+    on_fail_repeat_times=1
 )
-def check_json(file: dict, schema: dict) -> tuple[dict, dict]:
+def check(file: dict) -> dict:
     """Функция для валидации."""
-    return file, schema
+    return file
 
 
 def main():
     """App start: загрузка json, вызов функции."""
-    with open('sites.json') as f:
-        file_json = f.load(f)
-
-    with open('sites.schema.json.json') as s:
-        schema_json = s.load(s)
-
-    check_json(file_json, schema_json)
+    with open('sites.json', 'r', encoding='utf-8') as file_json:
+        file = json.load(file_json)
+        check(file)
 
 
 main()

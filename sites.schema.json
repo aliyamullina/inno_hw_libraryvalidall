@@ -1,5 +1,41 @@
 {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
     "type": "object",
-    "properties": {"site": {"type": "string"}, "ip": {"type": "string"}},
-    "required": ["site", "ip"],
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "site": "google.com",
+            "ip": "8.8.8.8"
+        }
+    ],
+    "required": [
+        "site",
+        "ip"
+    ],
+    "properties": {
+        "site": {
+            "$id": "#/properties/site",
+            "type": "string",
+            "title": "The site schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "google.com"
+            ]
+        },
+        "ip": {
+            "$id": "#/properties/ip",
+            "type": "string",
+            "title": "The ip schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "8.8.8.8"
+            ]
+        }
+    },
+    "additionalProperties": true
 }
