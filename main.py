@@ -63,20 +63,20 @@ def valid_all(
     return decoration
 
 
-def validate_json_with_schema(file: dict) -> Any:
+def validate_json_with_schema(file: dict) -> bool:
     """Происходит валидация входных данных."""
     try:
         with open("sites.schema.json", "r", encoding="utf-8") as file_schema:
             schema = json.load(file_schema)
             jsonschema.validate(file, schema)
             print("Валидация json пройдена")
-            return file
+            return True
     except jsonschema.exceptions.ValidationError as err:
         print("Ошибка валидации json:", err)
         return False
 
 
-def check_ip_address_with_regex(file: dict) -> Any:
+def check_ip_address_with_regex(file: dict) -> bool:
     """Проверка ip-адреса регулярным выражением."""
     regex_pattern = r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
     ip_address = file["ip"]
@@ -84,7 +84,7 @@ def check_ip_address_with_regex(file: dict) -> Any:
         return False
     else:
         print("Строка проверена")
-        return file
+        return True
 
 
 @valid_all(
@@ -92,18 +92,18 @@ def check_ip_address_with_regex(file: dict) -> Any:
     result_validation=check_ip_address_with_regex,
     on_fail_repeat_times=5,
 )
-def check(file: dict) -> dict:
+def get_check_file(file: dict) -> dict:
     """Функция для валидации."""
     print(file)
     return file
 
 
-def main() -> None:
+def main(file: str) -> None:
     """App start: загрузка json, вызов функции."""
-    with open("sites.json", "r", encoding="utf-8") as file_json:
-        file = json.load(file_json)
-        check(file)
+    with open(file, "r", encoding="utf-8") as file_json:
+        file_to_check = json.load(file_json)
+        get_check_file(file_to_check)
 
 
 if __name__ == "__main__":
-    main()
+    main("sites_not_regex.json")
