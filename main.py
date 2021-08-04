@@ -1,4 +1,5 @@
 import json
+import re
 import jsonschema as jsonschema
 from typing import Any, Callable
 from exceptions import InputParameterVerificationError, ResultVerificationError
@@ -50,8 +51,13 @@ def validate_json_with_schema(file: dict) -> Any:
 
 
 def check_ip_address_with_regex(file: dict) -> Any:
-    """Проверка доменных имен."""
-    pass
+    """Проверка ip-адреса регулярным выражением."""
+    regex_pattern = "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
+    ip_address = file["ip"]
+    if re.fullmatch(regex_pattern, ip_address) is None:
+        return False
+    else:
+        return file
 
 
 @valid_all(
