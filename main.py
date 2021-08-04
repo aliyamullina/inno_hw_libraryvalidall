@@ -2,17 +2,20 @@ import json
 import re
 import jsonschema as jsonschema
 from typing import Any, Callable
-from exceptions import InputParameterVerificationError, ResultVerificationError, OnFailRepeatTimesError
+from exceptions import (
+    InputParameterVerificationError,
+    ResultVerificationError,
+    OnFailRepeatTimesError,
+)
 
 
 def valid_all(
-        input_validation: Callable,
-        result_validation: Callable,
-        default_behavior: Callable = None,
-        on_fail_repeat_times: int = 1
+    input_validation: Callable,
+    result_validation: Callable,
+    default_behavior: Callable = None,
+    on_fail_repeat_times: int = 1,
 ) -> Callable:
-    """Универсальный декоратор для валидации входных и
-    выходных параметров функции."""
+    """Декоратор для валидации входных и выходных параметров функции."""
 
     def decoration(func: Callable) -> Callable:
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -51,7 +54,7 @@ def valid_all(
                             return result
 
                     if not default_behavior:
-                        print('Количество попыток превышено.')
+                        print("Количество попыток превышено.")
             else:
                 return func(*args, **kwargs)
 
@@ -63,7 +66,7 @@ def valid_all(
 def validate_json_with_schema(file: dict) -> Any:
     """Происходит валидация входных данных."""
     try:
-        with open('sites.schema.json', 'r', encoding='utf-8') as file_schema:
+        with open("sites.schema.json", "r", encoding="utf-8") as file_schema:
             schema = json.load(file_schema)
             jsonschema.validate(file, schema)
             print("Валидация json пройдена")
@@ -75,7 +78,7 @@ def validate_json_with_schema(file: dict) -> Any:
 
 def check_ip_address_with_regex(file: dict) -> Any:
     """Проверка ip-адреса регулярным выражением."""
-    regex_pattern = "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
+    regex_pattern = r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
     ip_address = file["ip"]
     if re.fullmatch(regex_pattern, ip_address) is None:
         return False
@@ -87,7 +90,7 @@ def check_ip_address_with_regex(file: dict) -> Any:
 @valid_all(
     input_validation=validate_json_with_schema,
     result_validation=check_ip_address_with_regex,
-    on_fail_repeat_times=5
+    on_fail_repeat_times=5,
 )
 def check(file: dict) -> dict:
     """Функция для валидации."""
@@ -95,15 +98,12 @@ def check(file: dict) -> dict:
     return file
 
 
-def main():
+def main() -> None:
     """App start: загрузка json, вызов функции."""
-    # Не проходит регулярку:
-    with open('not_regex_sites.json', 'r', encoding='utf-8') as file_json:
-    # Не проходит валидацию:
-    # with open('invalid_sites.json', 'r', encoding='utf-8') as file_json:
-    # with open('sites.json', 'r', encoding='utf-8') as file_json:
+    with open("sites.json", "r", encoding="utf-8") as file_json:
         file = json.load(file_json)
         check(file)
 
 
-main()
+if __name__ == "__main__":
+    main()
