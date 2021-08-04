@@ -14,28 +14,25 @@ def valid_all(
     """Универсальный декоратор для валидации входных и
     выходных параметров функции."""
 
-    def input_validation():
-        """Декоратор."""
-        try:
-            pass
-        except InputParameterVerificationError as err:
-            print(err)
+    def decoration(func: Callable) -> Callable:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            print("Старт")
 
-    def result_validation():
-        """Декоратор."""
-        try:
-            pass
-            default_behavior()
-        except ResultVerificationError as err:
-            print(err)
+            # Проверка валидации json
+            if not input_validation(*args, **kwargs):
+                raise InputParameterVerificationError()
+            else:
+                result = func(*args, **kwargs)
 
-    def default_behavior():
-        """Декоратор."""
-        pass
+            # Проверка регуляркой после валидации
+            if not result_validation(result):
+                raise ResultVerificationError()
+            else:
+                return func(*args, **kwargs)
 
-    def on_fail_repeat_times():
-        """Декоратор."""
-        pass
+        return wrapper
+
+    return decoration
 
 
 def validate_json_with_schema(file: dict) -> Any:
@@ -44,6 +41,7 @@ def validate_json_with_schema(file: dict) -> Any:
         with open('sites.schema.json', 'r', encoding='utf-8') as file_schema:
             schema = json.load(file_schema)
             jsonschema.validate(file, schema)
+            print("Валидация json пройдена")
             return file
     except jsonschema.exceptions.ValidationError as err:
         print("Ошибка валидации json:", err)
@@ -57,6 +55,7 @@ def check_ip_address_with_regex(file: dict) -> Any:
     if re.fullmatch(regex_pattern, ip_address) is None:
         return False
     else:
+        print("Строка проверена")
         return file
 
 
@@ -68,11 +67,16 @@ def check_ip_address_with_regex(file: dict) -> Any:
 )
 def check(file: dict) -> dict:
     """Функция для валидации."""
+    print(file)
     return file
 
 
 def main():
     """App start: загрузка json, вызов функции."""
+    # Не проходит регулярку:
+    # with open('not_regex_sites.json', 'r', encoding='utf-8') as file_json:
+    # Не проходит валидацию:
+    # with open('invalid_sites.json', 'r', encoding='utf-8') as file_json:
     with open('sites.json', 'r', encoding='utf-8') as file_json:
         file = json.load(file_json)
         check(file)
